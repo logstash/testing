@@ -33,8 +33,8 @@
     } /* compute delta and rolling average */
 
     /* Sizing and scales. */
-    var w = 900,
-        h = 300,
+    var w = 600,
+        h = 200,
         x = pv.Scale.linear(data, function(d) { return d.x }).range(0, w),
         y = pv.Scale.linear(0, max_y).range(0, h);
 
@@ -42,7 +42,7 @@
     var vis = new pv.Panel()
         .width(w)
         .height(h)
-        .bottom(20)
+        .bottom(80)
         .left(80)
         .right(10)
         .top(5);
@@ -53,8 +53,7 @@
         .bottom(y)
         .strokeStyle(function(d) { return d ? "#eee" : "#000" })
       .anchor("left").add(pv.Label)
-        .font("16pt")
-        .text(y.tickFormat);
+        .text(y.tickFormat)
 
     /* X-axis and ticks. */
     vis.add(pv.Rule)
@@ -79,8 +78,21 @@
     vis.add(pv.Label)
         .bottom(50)
         .left(150)
-        .font("24pt sans-serif")
-        .text(title);
+        .font("16pt sans-serif")
+        .text(title)
+
+    vis.add(pv.Label)
+        .left(-50)
+        .top(150)
+        .font("12pt sans")
+        .text("events/sec")
+        .textAngle(-Math.PI / 2);
+
+    vis.add(pv.Label)
+        .font("12pt sans")
+        .bottom(-40)
+        .left(250)
+        .text("duration (seconds)")
 
     vis.render();
   }
