@@ -78,7 +78,7 @@
 
     vis.add(pv.Label)
         .bottom(50)
-        .left(100)
+        .left(150)
         .font("24pt sans-serif")
         .text(title);
 
