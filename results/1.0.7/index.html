@@ -14,27 +14,35 @@
     <div id="center"><div id="fig">
     <script type="text/javascript+protovis">
 
+var WINDOW_SIZE = 10;
 var data = [];
       
 var last_y = 0;
 var max_y = 1;
+var rolling_window = []
 for (var i in window.benchmark_data) {
   var point = window.benchmark_data[i];
   delta_y = point.y - last_y;
   last_y = point.y;
-  data.push( { 
-    x: point.x,
-    y: delta_y
-  } )
+  rolling_window.push(delta_y);
 
-  max_y = Math.max(max_y, delta_y);
+  if (rolling_window.length > WINDOW_SIZE) {
+    rolling_window.shift();
+  }
+
+  var total = 0;
+  rolling_window.map(function(val) { total += val });
+  var average = total / rolling_window.length;
+
+  data.push({ 
+    x: point.x,
+    y: average
+  })
+
+  max_y = Math.max(max_y, average);
 }
-console.log(max_y);
-//var data = [
-  //{ x: 1, y: 1 },
-  //{ x: 2, y: 2 },
-  //{ x: 3, y: 3 },
-////];
+
+console.log(data)
 
 /* Sizing and scales. */
 var w = 900,
