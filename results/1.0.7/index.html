@@ -3,7 +3,7 @@
     <title>logstash benchmark</title>
     <link type="text/css" rel="stylesheet" href="ex.css?3.2"/>
     <script type="text/javascript" src="../../js/protovis-3.2/protovis-r3.2.js"></script>
-    <script type="text/javascript" src="output.js"></script>
+    <script type="text/javascript" src="../../js/plot.js"></script>
   </head>
   <body>
 
@@ -11,86 +11,19 @@
 
     Index rate with config stdin, grok, date, and elasticsearch. Log data is apache logs.
 
-    <div id="center"><div id="fig">
-    <script type="text/javascript+protovis">
+    <div>
+      <script type="text/javascript" src="output.js"></script>
+      <script type="text/javascript+protovis">
+        plot(benchmark_data, "stdin -> {grok, date} -> elasticsearch")
+      </script>
+    </div>
 
-var WINDOW_SIZE = 10;
-var data = [];
-      
-var last_y = 0;
-var max_y = 1;
-var rolling_window = []
-for (var i in window.benchmark_data) {
-  var point = window.benchmark_data[i];
-  delta_y = point.y - last_y;
-  last_y = point.y;
-  rolling_window.push(delta_y);
-
-  if (rolling_window.length > WINDOW_SIZE) {
-    rolling_window.shift();
-  }
-
-  var total = 0;
-  rolling_window.map(function(val) { total += val });
-  var average = total / rolling_window.length;
-
-  data.push({ 
-    x: point.x,
-    y: average
-  })
-
-  max_y = Math.max(max_y, average);
-}
-
-console.log(data)
-
-/* Sizing and scales. */
-var w = 900,
-    h = 300,
-    x = pv.Scale.linear(data, function(d) d.x).range(0, w),
-    y = pv.Scale.linear(0, max_y).range(0, h);
-
-/* The root panel. */
-var vis = new pv.Panel()
-    .width(w)
-    .height(h)
-    .bottom(20)
-    .left(20)
-    .right(10)
-    .top(5);
-
-/* Y-axis and ticks. */
-vis.add(pv.Rule)
-    .data(y.ticks(10))
-    .bottom(y)
-    .strokeStyle(function(d) d ? "#eee" : "#000")
-  .anchor("left").add(pv.Label)
-    .text(y.tickFormat);
-
-/* X-axis and ticks. */
-vis.add(pv.Rule)
-    .data(x.ticks())
-    .visible(function(d) d)
-    .left(x)
-    .bottom(-5)
-    .height(5)
-  .anchor("bottom").add(pv.Label)
-    .text(x.tickFormat);
-
-/* The area with top line. */
-vis.add(pv.Area)
-    .data(data)
-    .bottom(1)
-    .left(function(d) x(d.x))
-    .height(function(d) y(d.y))
-    .fillStyle("rgb(121,173,210)")
-  .anchor("top").add(pv.Line)
-    .lineWidth(3);
-
-vis.render();
-
-    </script>
-  </div></div>
+    <div>
+      <script type="text/javascript" src="output-stdin-to-stdout.js"></script>
+      <script type="text/javascript+protovis">
+        plot(data_stdin_to_stdout, "stdin -> {grok, date} -> stdout -> file on disk");
+      </script>
+    </div>
 
   <p>
 
