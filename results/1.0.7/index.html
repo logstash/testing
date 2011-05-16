@@ -11,6 +11,11 @@
 
     Index rate with config stdin, grok, date, and elasticsearch. Log data is apache logs.
 
+    <p>
+
+    Data input is 226440 lines of apache logs, 57mb log file, average of 265
+    bytes per event.
+
     <div>
       <script type="text/javascript" src="output.js"></script>
       <script type="text/javascript+protovis">
@@ -34,6 +39,34 @@
   I am not going to describe the test setup further; this benchmark data exists
   only to compare logstash versions against each other on my own undisclosed
   hardware.
+
+  <hr>
+
+  The config looks like the following. For the 'stdout -&gt; file on disk' run,
+  replace 'elasticsearch' with 'stdout'
+
+  <pre>
+input {
+  stdin { type =&gt; "apache-access" }
+}
+
+filter {
+  grok {
+    type =&gt; "apache-access"
+    pattern =&gt; "%{COMBINEDAPACHELOG}"
+  }
+
+  date {
+    type =&gt; "apache-access"
+    timestamp =&gt; "dd/MMM/yyyy:HH:mm:ss Z"
+  }
+}
+
+output {
+  elasticsearch { }
+}
+  </pre>
+
 
 </body>
 </html>

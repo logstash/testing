@@ -94,6 +94,11 @@
         .left(250)
         .text("duration (seconds)")
 
+    //vis.add(pv.Label)
+
+    //vis.anchor("right").add(pv.Label)
+        //.text("testing")
+
     vis.render();
   }
 })();
