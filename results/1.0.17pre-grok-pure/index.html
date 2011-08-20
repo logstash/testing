@@ -1,0 +1,111 @@
+<html>
+  <head>
+    <title>logstash benchmark</title>
+    <link type="text/css" rel="stylesheet" href="ex.css?3.2"/>
+    <script type="text/javascript" src="../../js/protovis-3.2/protovis-r3.2.js"></script>
+    <script type="text/javascript" src="../../js/plot.js"></script>
+    <style>
+      .vis {
+        margin-left: 20px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <h1> logstash benchmark </h1>
+
+    This experimental benchmark is comparing a few things. First, the new
+    pure-ruby grok against the ffi grok. Second, multithreaded filtering.
+
+    <p>
+
+    Logstash always supported multithreaded filter pipelines, but grok has some
+    thread unsafety that causes corruption and crashes, so I alwasy released a
+    logstash with 1 filter thread hard-coded.
+
+    <p>
+
+    Data input is 300,000-ish lines of apache logs.
+
+    <p>
+
+    <div class="vis">
+      Uses original/current jls-grok (ffi to libgrok). Parses 2800 events/sec.
+      <br>
+
+      <script type="text/javascript" src="output-grok-normal.js"></script>
+      <script type="text/javascript+protovis">
+        plot(grok_normal_data, "tcp input -> {grok, date} -> stdout")
+      </script>
+    </div>
+
+    <div class="vis">
+      Uses pure-grok and 1 filter thread. Gets about 3800 events/sec. 
+      Improved parsing speed by 36%. 
+      <br>
+
+      <script type="text/javascript" src="output-grok-pure.js"></script>
+      <script type="text/javascript+protovis">
+        plot(grok_pure_data, "tcp input -> {grok-pure, date} -> stdout")
+      </script>
+    </div>
+
+    <div class="vis">
+      Uses pure-grok and 2 filter threads. Gets about 6400 events/sec.
+      Improved parsing speed by an additional 68%.
+      <br>
+
+      <script type="text/javascript" src="output-grok-pure-2threads.js"></script>
+      <script type="text/javascript+protovis">
+        plot(output_grok_pure_2thread, "tcp input -> {grok-pure, date} x2 -> stdout")
+      </script>
+    </div>
+
+  <p>
+
+  (*) grok-pure is 'pure ruby' grok. Normal grok uses libgrok.
+
+  'x' axis is seconds since start of test. 'y' axis is messages in that second.
+
+  <p>
+
+  These tests were run on my Thinkpad X201 i5 M520 (2.4GHz). It has 4GB of RAM
+  and an Intel x-25m SSD. Number of 'busy' threads on Logstash at runtime should be
+  roughly 3 (or 4) threads (1 input, 1 or 2 filter, 1 output).
+
+  <hr>
+
+  The config looks like the following. For the 'stdout -&gt; file on disk' run,
+  replace 'elasticsearch' with 'stdout'
+
+  <pre>
+input {
+  tcp {
+    type =&gt; "apache"
+    port =&gt; 3333
+    data_timeout =&gt; -1
+  }
+}
+
+filter {
+  grok {
+    type =&gt; "apache"
+    named_captures_only =&gt; true
+    pattern =&gt; "%{COMBINEDAPACHELOG}"
+  }
+
+  #date {
+    #type =&gt; "apache"
+    #timestamp =&gt; "dd/MMM/YYYY:HH:mm:ss Z"
+  #}
+}
+
+output {
+  stdout { }
+}
+
+  </pre>
+
+
+</body>
+</html>
