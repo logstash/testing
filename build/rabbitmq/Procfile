@@ -1,0 +1,1 @@
+rabbitmq: env RABBITMQ_MNESIA_BASE=./rabbitmq/mnesia RABBITMQ_LOG_BASE=./rabbitmq/log ./sbin/rabbitmq-server
