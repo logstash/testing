@@ -11,7 +11,7 @@ EPREFIX?=$(HOME)/gentoo
 
 # Don't change things below here unless you know what you're doing :)
 VPATH=$(EPREFIX)
-PATH=tmp/usr/bin:usr/bin:$(shell echo $$PATH)
+PATH=$(EPREFIX)/usr/bin:$(EPREFIX)/tmp/usr/bin:$(shell echo $$PATH)
 
 .PHONY: bootstrap-portage
 bootstrap-portage:
@@ -32,30 +32,9 @@ bootstrap-portage:
 
 .PHONY: emerge-basics 
 emerge-basics: | bootstrap-portage
-	emerge --oneshot sed
-	#emerge --oneshot --nodeps bash
-	#emerge --oneshot --nodeps sys-apps/baselayout-prefix
-	#emerge --oneshot --nodeps app-arch/xz-utils
-	#emerge --oneshot --nodeps sys-devel/m4
-	#emerge --oneshot --nodeps sys-devel/flex
-	#emerge --oneshot --nodeps sys-devel/bison
-	#emerge --oneshot --nodeps sys-devel/binutils-config
-	#emerge --oneshot --nodeps sys-devel/binutils
-	#emerge --oneshot --nodeps sys-devel/gcc-config
-	#emerge --oneshot --nodeps "=sys-devel/gcc-4.2*"
-	#emerge --oneshot sys-apps/coreutils
-	#emerge --oneshot sys-apps/findutils
-	#emerge --oneshot app-arch/tar
-	#emerge --oneshot sys-apps/grep
-	#emerge --oneshot sys-devel/patch
-	#emerge --oneshot sys-apps/gawk
-	#emerge --oneshot sys-devel/make
-	#emerge --oneshot sys-libs/zlib
-	#emerge --oneshot --nodeps sys-apps/file
-	#emerge --oneshot --nodeps app-admin/eselect
-	#emerge --oneshot app-misc/pax-utils
-	#emerge --oneshot "<net-misc/wget-1.13.4-r1" (until we fix #393277)
-	#env FEATURES="-collision-protect" emerge --oneshot sys-apps/portage
+	sed -i -e 's,FEATURES=.*,FEATURES="$${FEATURES} -news nostrip",' $(EPREFIX)/etc/make.profile/make.defaults
+	$(MAKE) bin/sed
+	$(MAKE) bin/bash
 
 .PHONY: clean-bootstrap
 clean-bootstrap:
@@ -88,7 +67,7 @@ tmp/usr/bin/basename: | bootstrap-prefix.sh
 .PHONY: findutils
 findutils: tmp/usr/bin/find
 tmp/usr/bin/find: | bootstrap-prefix.sh
-	./bootstrap-prefix.sh $(EPREFIX)/tmp coreutils6
+	./bootstrap-prefix.sh $(EPREFIX)/tmp findutils
 
 tmp/usr/bin/tar: | bootstrap-prefix.sh
 	./bootstrap-prefix.sh $(EPREFIX)/tmp tar22
@@ -113,3 +92,41 @@ tmp/usr/bin/python: | bootstrap-prefix.sh
 
 usr/bin/emerge: | bootstrap-prefix.sh
 	./bootstrap-prefix.sh $(EPREFIX) portage
+
+
+## All the --oneshot stuff
+bin/sed:
+	emerge --oneshot sed
+
+bin/bash: usr/bin/bison usr/bin/flex
+	emerge --oneshot --nodeps bash
+
+usr/bin/bison: usr/bin/flex
+	emerge --oneshot --nodeps bison
+
+usr/bin/flex:
+	emerge --oneshot --nodeps flex
+
+remaining:
+	#emerge --oneshot --nodeps sys-apps/baselayout-prefix
+	#emerge --oneshot --nodeps app-arch/xz-utils
+	#emerge --oneshot --nodeps sys-devel/m4
+	#emerge --oneshot --nodeps sys-devel/flex
+	#emerge --oneshot --nodeps sys-devel/bison
+	#emerge --oneshot --nodeps sys-devel/binutils-config
+	#emerge --oneshot --nodeps sys-devel/binutils
+	#emerge --oneshot --nodeps sys-devel/gcc-config
+	#emerge --oneshot --nodeps "=sys-devel/gcc-4.2*"
+	#emerge --oneshot sys-apps/coreutils
+	#emerge --oneshot sys-apps/findutils
+	#emerge --oneshot app-arch/tar
+	#emerge --oneshot sys-apps/grep
+	#emerge --oneshot sys-devel/patch
+	#emerge --oneshot sys-apps/gawk
+	#emerge --oneshot sys-devel/make
+	#emerge --oneshot sys-libs/zlib
+	#emerge --oneshot --nodeps sys-apps/file
+	#emerge --oneshot --nodeps app-admin/eselect
+	#emerge --oneshot app-misc/pax-utils
+	#emerge --oneshot "<net-misc/wget-1.13.4-r1" (until we fix #393277)
+	#env FEATURES="-collision-protect" emerge --oneshot sys-apps/portage
