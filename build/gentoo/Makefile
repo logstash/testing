@@ -13,6 +13,8 @@ EPREFIX?=$(HOME)/gentoo
 VPATH=$(EPREFIX)
 PATH=$(EPREFIX)/usr/bin:$(EPREFIX)/tmp/usr/bin:$(shell echo $$PATH)
 
+default: emerge-basics
+
 .PHONY: bootstrap-portage
 bootstrap-portage:
 	$(MAKE) usr/portage
@@ -32,9 +34,34 @@ bootstrap-portage:
 
 .PHONY: emerge-basics 
 emerge-basics: | bootstrap-portage
+	# Disable stripping because the bootstrap doesn't come with 'scanelf'
+	# Also because I don't want to strip binaries anyway, makes them harder to
+	# debug.
 	sed -i -e 's,FEATURES=.*,FEATURES="$${FEATURES} -news nostrip",' $(EPREFIX)/etc/make.profile/make.defaults
 	$(MAKE) bin/sed
 	$(MAKE) bin/bash
+	$(MAKE) etc/gentoo-release # sys-apps/baselayout-prefix
+	$(MAKE) usr/bin/xz
+	$(MAKE) usr/bin/m4
+	$(MAKE) usr/bin/flex
+	$(MAKE) usr/bin/bison
+	$(MAKE) usr/bin/binutils-config # sys-devel/binutils-config
+	emerge --oneshot --nodeps sys-devel/binutils
+	#emerge --oneshot --nodeps sys-devel/gcc-config
+	#emerge --oneshot --nodeps "=sys-devel/gcc-4.2*"
+	#emerge --oneshot sys-apps/coreutils
+	#emerge --oneshot sys-apps/findutils
+	#emerge --oneshot app-arch/tar
+	#emerge --oneshot sys-apps/grep
+	#emerge --oneshot sys-devel/patch
+	#emerge --oneshot sys-apps/gawk
+	#emerge --oneshot sys-devel/make
+	#emerge --oneshot sys-libs/zlib
+	#emerge --oneshot --nodeps sys-apps/file
+	#emerge --oneshot --nodeps app-admin/eselect
+	#emerge --oneshot app-misc/pax-utils
+	#emerge --oneshot "<net-misc/wget-1.13.4-r1" (until we fix #393277)
+	#env FEATURES="-collision-protect" emerge --oneshot sys-apps/portage
 
 .PHONY: clean-bootstrap
 clean-bootstrap:
@@ -93,40 +120,36 @@ tmp/usr/bin/python: | bootstrap-prefix.sh
 usr/bin/emerge: | bootstrap-prefix.sh
 	./bootstrap-prefix.sh $(EPREFIX) portage
 
-
 ## All the --oneshot stuff
 bin/sed:
 	emerge --oneshot sed
 
-bin/bash: usr/bin/bison usr/bin/flex
+#bin/bash: #usr/bin/bison usr/bin/flex
+bin/bash: 
 	emerge --oneshot --nodeps bash
 
 usr/bin/bison: usr/bin/flex
-	emerge --oneshot --nodeps bison
+	# Can't install bash without bison, bison is flagged bad because /bin/sh doesn't exist.
+	# Hack it by symlinking for now.
+	if [ ! -e $(EPREFIX)/bin/sh ] ; then \
+		ln -s /bin/sh $(EPREFIX)/bin/sh; \
+		emerge --oneshot --nodeps sys-devel/bison; \
+		rm $(EPREFIX)/bin/sh; \
+	else \
+		1merge --oneshot --nodeps sys-devel/bison; \
+	fi
+
+etc/gentoo-release:
+	emerge --oneshot --nodeps sys-apps/baselayout-prefix
+
+usr/bin/xz:
+	emerge --oneshot --nodeps app-arch/xz-utils
+
+usr/bin/m4:
+	emerge --oneshot --nodeps sys-devel/m4
 
 usr/bin/flex:
-	emerge --oneshot --nodeps flex
+	emerge --oneshot --nodeps sys-devel/flex
 
-remaining:
-	#emerge --oneshot --nodeps sys-apps/baselayout-prefix
-	#emerge --oneshot --nodeps app-arch/xz-utils
-	#emerge --oneshot --nodeps sys-devel/m4
-	#emerge --oneshot --nodeps sys-devel/flex
-	#emerge --oneshot --nodeps sys-devel/bison
-	#emerge --oneshot --nodeps sys-devel/binutils-config
-	#emerge --oneshot --nodeps sys-devel/binutils
-	#emerge --oneshot --nodeps sys-devel/gcc-config
-	#emerge --oneshot --nodeps "=sys-devel/gcc-4.2*"
-	#emerge --oneshot sys-apps/coreutils
-	#emerge --oneshot sys-apps/findutils
-	#emerge --oneshot app-arch/tar
-	#emerge --oneshot sys-apps/grep
-	#emerge --oneshot sys-devel/patch
-	#emerge --oneshot sys-apps/gawk
-	#emerge --oneshot sys-devel/make
-	#emerge --oneshot sys-libs/zlib
-	#emerge --oneshot --nodeps sys-apps/file
-	#emerge --oneshot --nodeps app-admin/eselect
-	#emerge --oneshot app-misc/pax-utils
-	#emerge --oneshot "<net-misc/wget-1.13.4-r1" (until we fix #393277)
-	#env FEATURES="-collision-protect" emerge --oneshot sys-apps/portage
+usr/bin/binutils-config:
+	emerge --oneshot --nodeps "=sys-devel/binutils-config-2.21*"
