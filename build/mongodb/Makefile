@@ -3,9 +3,13 @@ TARBALL=mongodb-src-r$(VERSION).tar.gz
 DIR=mongodb-src-r$(VERSION)
 BASEURL=http://downloads.mongodb.org/src
 
-fetch: $(TARBALL)
+default: build
 
-extract: $(DIR)/
+fetch: $(TARBALL)
+extract: $(DIR)/ | fetch
+
+build: | extract
+	cd $(DIR); scons all
 
 distclean:
 	-rm -f $(TARBALL)

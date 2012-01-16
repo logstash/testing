@@ -1,0 +1,1 @@
+graylog2_server: java -jar graylog2-server-0.9.6/graylog2-server.jar
