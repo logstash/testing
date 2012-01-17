@@ -10,7 +10,6 @@ EPREFIX?=$(HOME)/gentoo
 
 # Don't change things below here unless you know what you're doing :)
 VPATH=$(EPREFIX)
-#PATH=$(EPREFIX)/fakebin:$(EPREFIX)/usr/bin:$(EPREFIX)/tmp/usr/bin:$(shell echo $$PATH)
 PATH=$(EPREFIX)/usr/bin:$(EPREFIX)/tmp/usr/bin:$(shell echo $$PATH)
 
 default: emerge-basics
@@ -38,10 +37,7 @@ emerge-basics: | bootstrap-portage
 	# Also because I don't want to strip binaries anyway, makes them harder to
 	# debug.
 	sed -i -e 's,FEATURES=.*,FEATURES="$${FEATURES} -news nostrip",' $(EPREFIX)/etc/make.profile/make.defaults
-	# Fake chgrp since some packages like to do it.
-	#-mkdir $(EPREFIX)/fakebin
-	#echo "#!/bin/sh" > $(EPREFIX)/fakebin/chgrp
-	#chmod 755 $(EPREFIX)/fakebin/chgrp
+	echo "PATH=$(EPREFIX)/usr/bin:$(EPREFIX)/bin" > $(EPREFIX)/profile.rc
 	$(MAKE) bin/sed
 	$(MAKE) bin/bash
 	$(MAKE) etc/gentoo-release # sys-apps/baselayout-prefix
@@ -61,7 +57,13 @@ emerge-basics: | bootstrap-portage
 	$(MAKE) usr/bin/eselect
 	$(MAKE) usr/bin/scanelf # app-misc/pax-utils
 	$(MAKE) usr/bin/wget
-	$(MAKE) var/db/pkg/sys-apps/portage*
+	if [ ! -e $(EPREFIX)/var/db/pkg/sys-apps/portage* ] ; then \
+		env FEATURES="-collision-protect" emerge --oneshot sys-apps/portage; \
+	fi
+	emerge --sync
+	@echo "All done!"
+	@echo "You may want to run: USE=-git emerge -u system"
+	@echo "And then: emerge -e system"
 
 .PHONY: clean-bootstrap
 clean-bootstrap:
@@ -199,6 +201,3 @@ usr/bin/scanelf:
 
 usr/bin/wget:
 	emerge --oneshot "<net-misc/wget-1.13.4-r1" # (until we fix #393277)
-
-var/db/pkg/sys-apps/portage%:
-	env FEATURES="-collision-protect" emerge --oneshot sys-apps/portage
