@@ -8,9 +8,9 @@
 #   % make bootstrap EPREFIX=path/to/location
 EPREFIX?=$(HOME)/gentoo
 
-
 # Don't change things below here unless you know what you're doing :)
 VPATH=$(EPREFIX)
+#PATH=$(EPREFIX)/fakebin:$(EPREFIX)/usr/bin:$(EPREFIX)/tmp/usr/bin:$(shell echo $$PATH)
 PATH=$(EPREFIX)/usr/bin:$(EPREFIX)/tmp/usr/bin:$(shell echo $$PATH)
 
 default: emerge-basics
@@ -38,6 +38,10 @@ emerge-basics: | bootstrap-portage
 	# Also because I don't want to strip binaries anyway, makes them harder to
 	# debug.
 	sed -i -e 's,FEATURES=.*,FEATURES="$${FEATURES} -news nostrip",' $(EPREFIX)/etc/make.profile/make.defaults
+	# Fake chgrp since some packages like to do it.
+	#-mkdir $(EPREFIX)/fakebin
+	#echo "#!/bin/sh" > $(EPREFIX)/fakebin/chgrp
+	#chmod 755 $(EPREFIX)/fakebin/chgrp
 	$(MAKE) bin/sed
 	$(MAKE) bin/bash
 	$(MAKE) etc/gentoo-release # sys-apps/baselayout-prefix
@@ -46,22 +50,18 @@ emerge-basics: | bootstrap-portage
 	$(MAKE) usr/bin/flex
 	$(MAKE) usr/bin/bison
 	$(MAKE) usr/bin/binutils-config # sys-devel/binutils-config
-	emerge --oneshot --nodeps sys-devel/binutils
-	#emerge --oneshot --nodeps sys-devel/gcc-config
-	#emerge --oneshot --nodeps "=sys-devel/gcc-4.2*"
-	#emerge --oneshot sys-apps/coreutils
-	#emerge --oneshot sys-apps/findutils
-	#emerge --oneshot app-arch/tar
-	#emerge --oneshot sys-apps/grep
-	#emerge --oneshot sys-devel/patch
-	#emerge --oneshot sys-apps/gawk
-	#emerge --oneshot sys-devel/make
-	#emerge --oneshot sys-libs/zlib
-	#emerge --oneshot --nodeps sys-apps/file
-	#emerge --oneshot --nodeps app-admin/eselect
-	#emerge --oneshot app-misc/pax-utils
-	#emerge --oneshot "<net-misc/wget-1.13.4-r1" (until we fix #393277)
-	#env FEATURES="-collision-protect" emerge --oneshot sys-apps/portage
+	$(MAKE) usr/bin/gcc-config
+	$(MAKE) usr/bin/gcc-4.2.4
+	$(MAKE) usr/bin/env
+	$(MAKE) usr/bin/find
+	$(MAKE) usr/bin/gawk
+	$(MAKE) usr/bin/make
+	$(MAKE) lib/libz.so.1 # sys-libs/zlib
+	$(MAKE) usr/bin/file
+	$(MAKE) usr/bin/eselect
+	$(MAKE) usr/bin/scanelf # app-misc/pax-utils
+	$(MAKE) usr/bin/wget
+	$(MAKE) var/db/pkg/sys-apps/portage*
 
 .PHONY: clean-bootstrap
 clean-bootstrap:
@@ -152,4 +152,53 @@ usr/bin/flex:
 	emerge --oneshot --nodeps sys-devel/flex
 
 usr/bin/binutils-config:
+	# Use 2.21 because 2.22 fails to build due to a patch failure.
 	emerge --oneshot --nodeps "=sys-devel/binutils-config-2.21*"
+
+etc/env.d/binutils:
+	emerge --oneshot --nodeps "=sys-devel/binutils-2.21*"
+
+usr/bin/gcc-config:
+	emerge --oneshot --nodeps sys-devel/gcc-config
+
+usr/bin/gcc-4.2.4:
+	emerge --oneshot --nodeps "=sys-devel/gcc-4.2.4*"
+
+usr/bin/env:
+	emerge --oneshot sys-apps/coreutils
+
+usr/bin/find:
+	emerge --oneshot sys-apps/findutils
+
+usr/bin/tar:
+	emerge --oneshot app-arch/tar
+
+usr/bin/grep:
+	emerge --oneshot sys-apps/grep
+
+usr/bin/patch:
+	emerge --oneshot sys-devel/patch
+
+usr/bin/gawk:
+	emerge --oneshot sys-apps/gawk
+
+usr/bin/make:
+	emerge --oneshot sys-devel/make
+
+lib/libz.so.1:
+	emerge --oneshot sys-libs/zlib
+
+usr/bin/file:
+	emerge --oneshot --nodeps sys-apps/file
+
+usr/bin/eselect:
+	emerge --oneshot --nodeps app-admin/eselect
+
+usr/bin/scanelf:
+	emerge --oneshot app-misc/pax-utils
+
+usr/bin/wget:
+	emerge --oneshot "<net-misc/wget-1.13.4-r1" # (until we fix #393277)
+
+var/db/pkg/sys-apps/portage%:
+	env FEATURES="-collision-protect" emerge --oneshot sys-apps/portage
