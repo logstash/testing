@@ -14,6 +14,10 @@ PATH=$(EPREFIX)/usr/bin:$(EPREFIX)/tmp/usr/bin:$(shell echo $$PATH)
 
 default: emerge-basics
 
+# The make invocations below could just be listed as dependencies, but since I
+# don't know the full dependency tree of gentoo prefix (just the list, not the
+# tree), I can't specify dependencies as normal make targets in the event that
+# someone tries to do 'make -J<N>'.
 .PHONY: bootstrap-portage
 bootstrap-portage:
 	$(MAKE) usr/portage
