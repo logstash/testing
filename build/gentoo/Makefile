@@ -138,7 +138,7 @@ usr/bin/bison: usr/bin/flex
 		emerge --oneshot --nodeps sys-devel/bison; \
 		rm $(EPREFIX)/bin/sh; \
 	else \
-		1merge --oneshot --nodeps sys-devel/bison; \
+		emerge --oneshot --nodeps sys-devel/bison; \
 	fi
 
 etc/gentoo-release:
