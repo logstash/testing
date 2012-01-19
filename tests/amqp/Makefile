@@ -1,5 +1,8 @@
 
-default: rabbitmq logstash
+dependencies: rabbitmq logstash
+
+run:
+	foreman start
 
 .PHONY: rabbitmq
 rabbitmq:
