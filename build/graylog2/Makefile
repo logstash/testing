@@ -5,6 +5,8 @@ WEB_TARBALL=graylog2-web-interface-$(VERSION).tar.gz
 WEB_DIR=graylog2-web-interface-$(VERSION)
 BASEURL=https://github.com/downloads/Graylog2
 
+default: extract
+
 fetch: $(WEB_TARBALL) $(SERVER_TARBALL)
 
 extract: $(SERVER_DIR)/
