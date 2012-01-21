@@ -1,12 +1,15 @@
 run: mongodb graylog2
+	-mkdir mongodb graylog2 elasticsearch
 	foreman start
 
 dependencies: graylog2 mongodb logstash
 
+clean:
+	rm -r graylog2/ mongodb/ elasticsearch/
+
 .PHONY: mongodb
 mongodb:
 	$(MAKE) -C ../../build/mongodb
-	-mkdir mongodb
 
 .PHONY: graylog2
 graylog2:

@@ -1,5 +1,5 @@
 logstash_gelf: java -jar ../../build/logstash/logstash-*/build/logstash-*-monolithic.jar agent -v -f logstash-gelf.conf
-graylog2: java -jar ../../build/graylog2/graylog2-server-*/graylog2-server.jar -f graylog2.conf -d
-mongodb: env LD_LIBRARY_PATH=$HOME/gentoo/usr/lib ../../build/mongodb/mongodb-src-r*/mongod --dbpath ./mongodb
+graylog2: ruby graylog2-rube-goldberg-device.rb java -jar ../../build/graylog2/graylog2-server-*/graylog2-server.jar -f graylog2.conf -d -p graylog2/pid
+mongodb: env LD_LIBRARY_PATH=$HOME/gentoo/usr/lib ../../build/mongodb/mongodb-src-r*/mongod --dbpath ./mongodb --noauth
 data_generator: ruby ../generator.rb
 elasticsearch: sh ../../build/elasticsearch/elasticsearch-0.18.7/bin/elasticsearch -f
