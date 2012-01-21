@@ -2,11 +2,11 @@
 dependencies: rabbitmq logstash
 
 .PHONY: direct
-direct: rabbitmq logstash
+direct: #rabbitmq logstash
 	cd $@; foreman start
 
 .PHONY: fanout
-fanout: rabbitmq logstash
+fanout: #rabbitmq logstash
 	cd $@; foreman start
 
 clean:
