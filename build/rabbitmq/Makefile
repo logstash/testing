@@ -8,6 +8,9 @@ default: extract
 fetch: $(TARBALL)
 extract: $(DIR) | fetch
 
+clean:
+	rm -rf $(DIR) erl_crash.dump rabbitmq/
+
 distclean:
 	-rm -f $(TARBALL)
 

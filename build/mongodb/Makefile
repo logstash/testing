@@ -13,6 +13,9 @@ build: mongodb-src-r$(VERSION)/mongod
 mongodb-src-r$(VERSION)/mongod: | extract
 	cd $(DIR); scons --cpppath ~/gentoo/usr/include --libpath ~/gentoo/usr/lib all
 
+clean:
+	-rm -rf $(DIR)
+
 distclean:
 	-rm -f $(TARBALL)
 

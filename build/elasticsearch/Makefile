@@ -9,6 +9,9 @@ fetch: $(TARBALL)
 
 extract: $(DIR)/
 
+clean:
+	-rm -rf $(DIR)
+
 distclean:
 	-rm -f $(TARBALL)
 

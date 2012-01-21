@@ -11,6 +11,9 @@ fetch: $(WEB_TARBALL) $(SERVER_TARBALL)
 
 extract: $(SERVER_DIR)/
 
+clean:
+	-rm -rf $(SERVER_DIR) $(WEB_DIR)
+
 distclean:
 	-rm -f $(WEB_TARBALL) $(SERVER_TARBALL)
 
