@@ -1,0 +1,3 @@
+logstash_zeromq_output: ../run-logstash.sh logstash-zeromq-output.conf
+logstash_zeromq_input: ../run-logstash.sh logstash-zeromq-input.conf
+data_generator: ruby ../generator.rb 9017
