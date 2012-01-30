@@ -1,0 +1,3 @@
+logstash: java -jar $HOME/projects/logstash/build/logstash-*-monolithic.jar agent -v -f logstash-elasticsearch.conf -- web --backend elasticsearch:///embedded-testing-funtimes
+data_generator: ruby ../generator.rb
+elasticsearch: sh ../../build/elasticsearch/elasticsearch-0.18.7/bin/elasticsearch -f

@@ -18,5 +18,5 @@ distclean:
 $(TARBALL):
 	wget $(BASEURL)/$(TARBALL)
 
-$(DIR): $(TARBALL)
+$(DIR)/: $(TARBALL)
 	tar -zxf $<
