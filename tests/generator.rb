@@ -7,7 +7,7 @@ $stdout.sync = true
 
 fd = SocketWaiter.tcp_connect("localhost", 9010)
 
-50.times do |i|
+(ARGV[0].to_i or 50).times do |i|
   fd.puts i
   sleep 1
 end
