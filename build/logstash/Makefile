@@ -1,24 +1,12 @@
-VERSION?=master
-DIR=logstash-$(VERSION)
-TARBALL=logstash-$(VERSION).tar.gz
+DIR=logstash
 
 default: build
 
-fetch: $(TARBALL)
-extract: $(DIR)/ | fetch
-
-build: | extract
-	cd $(DIR); make jar
+build: | $(DIR)/
+	cd $(DIR); git pull --rebase; make jar
 
 clean:
-	-rm -rf logstash-$(VERSION)
+	-rm -rf $(DIR)
 
-distclean:
-	-rm -f $(TARBALL)
-
-$(TARBALL):
-	wget -O $(TARBALL) https://github.com/logstash/logstash/tarball/$(VERSION)
-
-$(DIR)/: $(TARBALL)
-	-mkdir $(DIR)
-	tar --strip-components=1 -C $(DIR) -zxf $<
+$(DIR)/:
+	git clone https://github.com/logstash/logstash.git

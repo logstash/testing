@@ -1,5 +1,5 @@
 rabbitmq: env RABBITMQ_MNESIA_BASE=./rabbitmq/mnesia RABBITMQ_LOG_BASE=./rabbitmq/log RABBITMQ_NODENAME=logstash-testing RABBITMQ_NODE_PORT=5699 ../../../build/rabbitmq/rabbitmq_server-*/sbin/rabbitmq-server
-logstash_amqp_output: java -jar ../../../build/logstash/logstash-*/build/logstash-*-monolithic.jar agent -v -f logstash-amqp-output.conf
-logstash_amqp_input_1: java -jar ../../../build/logstash/logstash-*/build/logstash-*-monolithic.jar agent -v -f logstash-amqp-input.conf
-logstash_amqp_input_2: java -jar ../../../build/logstash/logstash-*/build/logstash-*-monolithic.jar agent -v -f logstash-amqp-input.conf
+logstash_amqp_output: java -jar ../../../build/logstash/logstash/build/logstash-*-monolithic.jar agent -v -f logstash-amqp-output.conf
+logstash_amqp_input_1: java -jar ../../../build/logstash/logstash/build/logstash-*-monolithic.jar agent -v -f logstash-amqp-input.conf
+logstash_amqp_input_2: java -jar ../../../build/logstash/logstash/build/logstash-*-monolithic.jar agent -v -f logstash-amqp-input.conf
 data_generator: ruby ../generator.rb

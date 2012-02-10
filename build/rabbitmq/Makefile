@@ -6,7 +6,7 @@ BASEURL=http://www.rabbitmq.com/releases/rabbitmq-server/v$(VERSION)
 default: extract
 
 fetch: $(TARBALL)
-extract: $(DIR) | fetch
+extract: | $(DIR)/
 
 clean:
 	rm -rf $(DIR) erl_crash.dump rabbitmq/
