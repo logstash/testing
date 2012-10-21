@@ -1,8 +1,0 @@
-# normal lines counting
-start=$(date +%s); while true; do echo -n "$(( $(date +%s) - $start )) "; wc -l < /c/output; sleep 1; done | tee output
-
-# Elasticsearch
-start=$(date +%s); while true; do echo -n "$(( $(date +%s) - $start )) "; curl -s 'http://localhost:9200/_count?q=*&pretty=true' | grep count | fex :2-1,1; sleep 1; done | tee output
-
-# Convert output to js
-awk 'BEGIN { print "var data = ["; } {print "{ x: "$1", y: "$2" }," } END { print "];" }' output > output.js
