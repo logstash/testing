@@ -1,6 +1,20 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+def provision(config, *roles)
+  config.vm.provision :puppet, :module_path => "modules" do |puppet|
+    puppet.manifests_path = "manifests"
+    puppet.manifest_file  = "site.pp"
+
+    puppet.facter = {}
+    ENV.each do |key, value|
+      next unless key =~ /^FACTER_/
+      puppet.facter[key.gsub(/^FACTER_/, "")] = value
+    end
+    puppet.facter["roles"] = roles.join(",")
+  end
+end
+
 Vagrant::Config.run do |config|
   # All Vagrant configuration is done here. The most common configuration
   # options are documented and commented below. For a complete reference,
@@ -13,12 +27,12 @@ Vagrant::Config.run do |config|
   # doesn't already exist on the user's system.
   config.vm.box_url = "https://vagrant-jls.objects.dreamhost.com/ubuntu-12.10-amd64.box"
 
-  config.vm.forward_port 5601, 5601
-  config.vm.forward_port 9200, 9200
-  config.vm.forward_port 5001, 5001
+  config.vm.define :redis do |redis_config|
+    redis_config.vm.host_name = "redis"
+    provision(redis_config, "redis")
+  end
 
-  config.vm.provision :puppet, :module_path => "modules"  do |puppet|
-    puppet.manifests_path = "manifests"
-    puppet.manifest_file  = "site.pp"
+  config.vm.define :default do |c|
+    provision(c)
   end
 end
