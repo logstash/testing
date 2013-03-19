@@ -1,8 +1,8 @@
-set -e
-vagrant up
+. ./lib.rc
+quiet vagrant up
 vagrant ssh <<SCRIPT
-set -e
-cd /app/logstash/logstash
-sudo -u logstash make vendor/bundle
-sudo -u logstash bin/logstash rspec $*
+`cat ./lib.rc`
+cd /app/logstash/logstash || exit 1
+quiet sudo -u logstash make vendor/bundle || exit 1
+exec sudo -u logstash env USE_JRUBY=1 bin/logstash rspec $*
 SCRIPT
