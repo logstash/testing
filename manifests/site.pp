@@ -2,4 +2,8 @@ include os
 include apt::update
 include logstash
 
-notice("Roles: $roles")
+$roles_list = split($roles, ",")
+
+if member($roles_list, "redis") {
+  include redis
+}
