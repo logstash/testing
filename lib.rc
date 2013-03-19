@@ -1,0 +1,13 @@
+quiet() {
+  out=$(mktemp)
+  err=$(mktemp)
+  "$@" > $out 2> $err
+  code=$?
+  if [ "$code" -ne 0 ] ; then
+    cat $out
+    cat $err
+    echo "Exited($code): $@"
+    return $code
+  fi
+}
+
