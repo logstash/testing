@@ -1,4 +1,4 @@
-VERSION?=2.4.17
+VERSION?=2.6.11
 TARBALL=redis-$(VERSION).tar.gz
 DIR=redis-$(VERSION)
 BASEURL=http://redis.googlecode.com/files
