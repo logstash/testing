@@ -1,17 +1,22 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-def provision(config, *roles)
-  config.vm.provision :puppet, :module_path => "modules" do |puppet|
-    puppet.manifests_path = "manifests"
-    puppet.manifest_file  = "site.pp"
+def vm(config, name, *roles)
+  roles << name
+  config.vm.define name do |m|
+    m.vm.host_name = name
 
-    puppet.facter = {}
-    ENV.each do |key, value|
-      next unless key =~ /^FACTER_/
-      puppet.facter[key.gsub(/^FACTER_/, "")] = value
+    m.vm.provision :puppet, :module_path => "modules" do |puppet|
+      puppet.manifests_path = "manifests"
+      puppet.manifest_file  = "site.pp"
+
+      puppet.facter = {}
+      ENV.each do |key, value|
+        next unless key =~ /^FACTER_/
+        puppet.facter[key.gsub(/^FACTER_/, "")] = value
+      end
+      puppet.facter["roles"] = roles.join(",")
     end
-    puppet.facter["roles"] = roles.join(",")
   end
 end
 
@@ -27,12 +32,5 @@ Vagrant::Config.run do |config|
   # doesn't already exist on the user's system.
   config.vm.box_url = "https://vagrant-jls.objects.dreamhost.com/ubuntu-12.10-amd64.box"
 
-  config.vm.define :redis do |redis_config|
-    redis_config.vm.host_name = "redis"
-    provision(redis_config, "redis")
-  end
-
-  config.vm.define :default do |c|
-    provision(c)
-  end
+  vm(config, "redis")
 end
