@@ -1,0 +1,25 @@
+#!/bin/sh
+
+exec > /tmp/bundle_exec.out.<%= user %>
+exec 2> /tmp/bundle_exec.err.<%= user %>
+# This is a dumb hack to get the puppet exec 'shell' provider to use bash instead.
+# Only necessary because debian's /bin/sh is horribly under-featured.
+exec bash - <<ENDOFSCRIPT
+set -x
+set -e
+
+echo "PWD: $(pwd)"
+
+USER="<%= user %>"
+HOME="\$(getent passwd "\$USER" | awk -F: '{print \$(NF-1)}')"
+export HOME
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+rvm="\${HOME}/.rvm/scripts/rvm"
+. "\$rvm"
+
+rvm use 1.9.3 || rvm install 1.9.3
+bundle install
+exec bundle exec <%= command %>
+ENDOFSCRIPT

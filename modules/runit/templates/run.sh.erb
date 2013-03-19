@@ -1,0 +1,26 @@
+#!/bin/bash
+
+exec 2>&1
+
+ulimit -n 100000
+# lolbash
+exec chpst -o 100000 -u<%= user %> bash - <<COMMAND
+HOME="\$(getent passwd "<%= user %>" | awk -F: '{print \$(NF-1)}')"
+export HOME
+
+rvm="\${HOME}/.rvm/scripts/rvm"
+
+echo "Loading RVM"
+[ -f "\$rvm" ] && . "\$rvm"
+
+# Hardcode 1.9.3 because ruby 2.0.0 is not ready.
+rvm use 1.9.3 || rvm install 1.9.3
+
+cd <%= directory %>
+if [ -f "Gemfile" ] ; then
+  bundle install
+  exec bundle exec <%= command %>
+else
+  exec <%= command %>
+fi
+COMMAND
