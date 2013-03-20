@@ -1,21 +1,17 @@
 stage {
-  "you will be upgraded": before => Stage["main"];
+  "upgrade": before => Stage["main"];
 }
 
 class {
-  "apt::update": stage => "you will be upgraded";
-  "apt::upgrade": stage => "you will be upgraded";
-}
-
-class {
+  "apt::upgrade": stage => "upgrade";
   "os": ;
   "vagrant::guest": ;
-  "logstash":
+  "logstash": 
     revision => $logstash_revision;
 }
 
 $roles_list = split($roles, ",")
 
 if member($roles_list, "redis") {
-  include redis
+  class { "redis": ; }
 }
