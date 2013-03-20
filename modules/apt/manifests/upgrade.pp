@@ -4,8 +4,7 @@ class apt::upgrade {
 
   exec { 'apt_upgrade':
     command => "${apt::params::provider} upgrade -y",
-    require => Exec["apt_update"],
-    refreshonly => true;
+    require => Exec["apt_update"];
   }
 
   Package <| |> {
