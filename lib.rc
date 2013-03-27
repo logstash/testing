@@ -11,3 +11,6 @@ quiet() {
   fi
 }
 
+note() {
+  echo "$(date +%Y-%m-%dT%H:%M:%S) $@"
+}
