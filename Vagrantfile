@@ -6,6 +6,8 @@ def vm(config, name, *roles)
   config.vm.define name do |m|
     m.vm.host_name = name
 
+    #m.vm.provision :shell, :inline => "apt-get update"
+    #m.vm.provision :shell, :inline => "apt-get upgrade -y"
     m.vm.provision :puppet, :module_path => "modules" do |puppet|
       puppet.manifests_path = "manifests"
       puppet.manifest_file  = "site.pp"
