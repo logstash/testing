@@ -4,6 +4,7 @@ class apt::upgrade {
 
   exec { 'apt_upgrade':
     command => "${apt::params::provider} upgrade -y",
+    timeout => 1800,
     require => Exec["apt_update"];
   }
 
